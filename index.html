@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verificador del amigo secreto</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:20px;color:#222}
+.card{max-width:520px;margin:auto;background:#fff;padding:24px;border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+h1{text-align:center;font-size:24px}
+p{line-height:1.45}
+label{display:block;font-weight:bold;margin:20px 0 8px}
+select,button{width:100%;padding:14px;border-radius:10px;font-size:16px;box-sizing:border-box}
+select{border:1px solid #ccc;background:#fff}
+button{margin-top:24px;border:0;background:#222;color:#fff;font-weight:bold}
+#resultado{display:none;margin-top:20px;padding:17px;border-radius:12px;line-height:1.5}
+.ok{background:#e8f7ec}.change{background:#fff3d0}.invalid{background:#eee}
+.small{text-align:center;color:#777;font-size:13px;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>🎁 Verificador del amigo secreto</h1>
+<p>Selecciona las dos frutas que tienes actualmente asignadas y verifica tu resultado.</p>
+
+<label>1. ¿Qué fruta eres?</label>
+<select id="frutaA"></select>
+
+<label>2. ¿A qué fruta le das regalo?</label>
+<select id="frutaB"></select>
+
+<button onclick="verificar()">VERIFICAR MI ASIGNACIÓN</button>
+<div id="resultado"></div>
+<p class="small">🤫 El resultado solo muestra la información necesaria para ti.</p>
+</div>
+
+<script>
+const frutas=[
+["sandia","🍉 Sandía"],["coco","🥥 Coco"],["kiwi","🥝 Kiwi"],
+["maracuya","🥭 Maracuyá"],["granadilla","🟣 Granadilla"],
+["banano","🍌 Banano"],["pina","🍍 Piña"],
+["fresa","🍓 Fresa"],["zapote","🟤 Zapote"]
+];
+
+const correctas=new Set([
+"coco|pina","pina|banano","banano|zapote","zapote|kiwi","kiwi|coco",
+"sandia|fresa","fresa|maracuya","maracuya|granadilla","granadilla|sandia"
+]);
+
+const cambios={
+"kiwi|zapote":["zapote","kiwi"],
+"maracuya|fresa":["fresa","maracuya"]
+};
+
+const nombres=Object.fromEntries(frutas);
+const A=document.getElementById("frutaA"), B=document.getElementById("frutaB");
+
+frutas.forEach(([valor,nombre])=>{
+ A.innerHTML+=`<option value="${valor}">${nombre}</option>`;
+ B.innerHTML+=`<option value="${valor}">${nombre}</option>`;
+});
+
+function verificar(){
+ const combinacion=A.value+"|"+B.value;
+ const resultado=document.getElementById("resultado");
+ resultado.style.display="block";
+
+ if(correctas.has(combinacion)){
+  resultado.className="ok";
+  resultado.innerHTML="✅ <strong>Tu asignación es correcta.</strong><br><br>"+
+  "Tu fruta y la persona a quien debes darle el regalo se mantienen igual. 🤫";
+ }else if(cambios[combinacion]){
+  const nueva=cambios[combinacion][0], regalo=cambios[combinacion][1];
+  resultado.className="change";
+  resultado.innerHTML="⚠️ <strong>Tu asignación ha cambiado.</strong><br><br>"+
+  "Ahora eres: <strong>"+nombres[nueva]+"</strong><br>"+
+  "Debes darle tu regalo a: <strong>"+nombres[regalo]+"</strong><br><br>"+
+  "Esta es tu asignación definitiva. 🤫🎁";
+ }else{
+  resultado.className="invalid";
+  resultado.innerHTML="🔎 <strong>Esa combinación no corresponde a una asignación válida.</strong><br><br>"+
+  "Si estabas intentando adivinar una combinación, tendrás que seguir intentando... 😏<br><br>"+
+  "Si crees que cometiste un error al responder, vuelve a seleccionar tus frutas.";
+ }
+}
+</script>
+</body>
+</html>
